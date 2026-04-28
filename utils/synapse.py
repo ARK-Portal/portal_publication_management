@@ -14,6 +14,17 @@ import synapseutils
 from synapseclient.models import query, File, Table
 
 
-def get_ark_pubs():
-  df = query("SELECT ")
+def get_all_pubs():
+  syn = synapseclient.login()
+  df = query("SELECT id, DOI, PMID from syn64429484")
+  
+  out = {'PMID': [], 'DOI': []}
+  pmid = df[df.PMID.str.match("^PMID:") == True]
+  out['PMID'] = list(set(list(pmid.PMID)))
+  doi = df[df.DOI.str.match("^10") == True]
+  out['DOI'] = list(set(list(doi.DOI)))
+  
+  return(out)
+
+# END
   
