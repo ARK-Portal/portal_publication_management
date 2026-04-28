@@ -21,6 +21,7 @@ def get_all_pubs():
   out = {'PMID': [], 'DOI': []}
   pmid = df[df.PMID.str.match("^PMID:") == True]
   out['PMID'] = list(set(list(pmid.PMID)))
+  out['PMID'] = [item.replace("PMID:", "") for item in out['PMID']]
   doi = df[df.DOI.str.match("^10") == True]
   out['DOI'] = list(set(list(doi.DOI)))
   
