@@ -5,18 +5,25 @@
 # import necessary libraries
 import sys
 import os
+import re
 from dotenv import load_dotenv
 import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
+sys.path.append("utils")
+from utils import *
+from query_pubmed import *
+from synapse import *
 
+# find new pubs, update pub metadata
+# write to csv for human-in-the-loop review and PR merge
 def main():
-  
-  ark_catalog = get_ark_pubs()
   
   ncbiapikey = get_ncbi_api_key()
   
-  pubmed_ids = query_pubmed_ids(ignore_ids = list(ark_catalog['PMID']))
+  all_ark_pubs = get_all_pubs() # returns dict of PMID and DOI lists
+  
+  pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'])
   doi = pmid_to_doi(ids = pubmed_ids)
   
   results = pd.DataFrame({'PMID': pubmed_ids, 'DOI': doi})
