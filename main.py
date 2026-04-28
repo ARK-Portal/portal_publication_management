@@ -23,11 +23,8 @@ def main():
   
   all_ark_pubs = get_all_pubs() # returns dict of PMID and DOI lists
   
-  pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'])
-  doi = pmid_to_doi(ids = pubmed_ids)
-  
-  results = pd.DataFrame({'PMID': pubmed_ids, 'DOI': doi})
-  results = results.dropna()
+  pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'], token = ncbiapikey)
+  results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey)
   
   results = query_crossref(results)
   results = filter_results(results)
