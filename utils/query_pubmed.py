@@ -120,6 +120,7 @@ def process_pubmed_results(results, trans):
   results['PMCID'] = [''.join(['pmc:', x]) for x in results['PMCID']]
   
   anno_template = get_ark_pub_anno_template()
+  anno_template['authors'] = [None]
   keep = [x for x in list(results.columns) if x in list(anno_template.columns)]
   results = results.loc[:, keep]
   add = [x for x in list(anno_template.columns) if x not in list(results.columns)]
