@@ -1,7 +1,16 @@
 {
-  "Title": "title",
-  "PubDate": "publicationDate",
-  "pmc": "PMCID",
-  "FullJournalName": "journal",
-  "doi": "DOI"
+  "pubmed": {
+    "Title": "title",
+    "PubDate": "publicationDate",
+    "pmc": "PMCID",
+    "FullJournalName": "journal",
+    "doi": "DOI"
+  }, 
+  "crossref": {
+    "journal": [], 
+    "year": [],
+    "title": [],
+    "publicationDate": [], 
+    "authors": []
+  }
 }

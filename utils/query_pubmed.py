@@ -49,7 +49,7 @@ def get_pubmed_metadata(ids, token, scope):
   data = get_xml_grandchild(root)
   
   with open('json/metadata_translation.json', 'r') as file:
-    metadata_translation = json.load(file)
+    metadata_translation = json.load(file)['pubmed']
   
   results = {'Source': [], 'authors': [], 'FirstAuthorSurname': []}
   for k in metadata_translation.keys():
@@ -121,6 +121,7 @@ def process_pubmed_results(results, trans):
   
   anno_template = get_ark_pub_anno_template()
   anno_template['authors'] = [None]
+  anno_template['name'] = [None]
   keep = [x for x in list(results.columns) if x in list(anno_template.columns)]
   results = results.loc[:, keep]
   add = [x for x in list(anno_template.columns) if x not in list(results.columns)]
