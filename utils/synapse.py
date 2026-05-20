@@ -26,7 +26,11 @@ def get_all_pubs():
   pmid = df[df.PMID.str.match("^PMID:") == True]
   out['PMID'] = list(set(list(pmid.PMID)))
   out['PMID'] = [item.replace("PMID:", "") for item in out['PMID']]
-  doi = df[df.DOI.str.match("^10") == True]
+  
+  # only return DOI for pubs without a PMID 
+  # this way we query CrossRef for pubs not yet in pubmed
+  doi = df[df.PMID.str.match("^PMID:") != True] # remove pubs with PMID
+  doi = doi[doi.DOI.str.match("^10") == True] # then select those with DOI
   out['DOI'] = list(set(list(doi.DOI)))
   
   return(out)

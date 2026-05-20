@@ -30,7 +30,9 @@ def main(scope = None):
     # using returned pubmed ids query pubmed for publication metadata
     results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope = scope)
     
-    results = query_crossref(results)
+    doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['DOI'])]
+    # query CrossRef for pub metadata for pubs not yet in pubmed
+    results = query_crossref(doi)
     results = filter_results(results)
 
 if __name__ == "__main__":
