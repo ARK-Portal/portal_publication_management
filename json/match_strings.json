@@ -1,0 +1,12 @@
+{
+  "project":{
+    "RA": "synovial|rheumatoid| RA ",
+    "SLE": "lupus|kidney| SLE ",
+    "STAMP": "Sjogren|salivary", 
+    "ELLIPSS": "psoriatic|psoriasis"
+  }, 
+  "program":{
+    "AMP RA/SLE": "SLE|lupus|rheumatoid", 
+    "AMP AIM": " AIM|autoimmune"
+  }
+}
