@@ -36,7 +36,7 @@ def query_pubmed_ids(ignore_ids, token):
   
   return(pubmed_ids)
 
-def get_pubmed_metadata(ids, token):
+def get_pubmed_metadata(ids, token, scope):
   uid_list = ",".join(ids)
   #esummary.fcgi?db=<database>&id=<uid_list>
   query = ["https://eutils.ncbi.nlm.nih.gov/", 
@@ -48,7 +48,7 @@ def get_pubmed_metadata(ids, token):
   root = ET.fromstring(query_response.content)
   data = get_xml_grandchild(root)
   
-  with open('metadata_translation.json', 'r') as file:
+  with open('json/metadata_translation.json', 'r') as file:
     metadata_translation = json.load(file)
   
   results = {'Source': [], 'authors': [], 'FirstAuthorSurname': []}
@@ -65,7 +65,15 @@ def get_pubmed_metadata(ids, token):
   
   results = pd.DataFrame(results)
   results['PMID'] = list(data.keys())
-  results = process_pubmed_results(results, trans = metadata_translation)
+  # select for AMP AIM and AMP RA/SLE publications
+  with open('json/scope_filters.json', 'r') as file:
+    program_filter = json.load(file)
+  
+  test = '|'.join(program_filter[scope])
+  results = results[results['authors'].str.contains(test)]
+  results = results.reset_index(drop = True)
+  
+  #results = process_pubmed_results(results, trans = metadata_translation)
   
   return(results)
 
@@ -100,10 +108,12 @@ def process_pubmed_results(results, trans):
   
   # add additional columns to fill out annotation template
   ## guess at program label
-  results['program'] = results['authors'].apply(lambda x:guess_program(x))
+  results['program'] = results['authors'].apply(lambda x:guess_annotation(x, which = "program"))
+  results['project'] = results['title'].apply(lambda x:guess_annotation(x, which = "project"))
   results['URL'] = [''.join(["https://doi.org/", x]) if re.search('10', x) else None for x in results['DOI']]
   ## guess at publicationType
-  results['publicationType'] = 
+  x = list(map(lambda x, y: '|'.join([x,y]), list(results.title), list(results.journal)))
+  results['publicationType'] = list(map(lambda x, y: guess_pubType(x, y), list(results.title), list(results.journal)))
   
   # modify identifiers for synapse registry match
   results['PMID'] = [''.join(['PMID:', x]) for x in results['PMID']]
