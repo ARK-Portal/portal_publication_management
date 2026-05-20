@@ -3,7 +3,7 @@
 # utils.py
 
 '''
-general utility funcitons to support workflow execution
+general utility functions to support workflow execution
 '''
 
 import os
@@ -22,36 +22,66 @@ def get_ncbi_api_key():
   else:
     return(ncbiapikey)
 
-def guess_program(x):
-  match_strings = {"AMP RA/SLE": "AMP RA/SLE|lupus|rheumatoid", 
-                   "AMP AIM": "AMP AIM|autoimmune"}
+def get_ark_pub_anno_template():
+  fid = "https://raw.githubusercontent.com/ARK-Portal/data_model/refs/heads/main/model_templates/ark.PublicationMetadataTemplate.csv"
+  df = pd.read_csv(fid)
+  if 'Component' in list(df.columns):
+    df = df.drop(columns = ['Component'])
+  return(df)
+
+def guess_annotation(x, which = None):
+  if which is None:
+    print("need to define 'which', options are 'program', 'project'")
+  
+  with open('json/match_strings.json', 'r') as file:
+    match_strings = json.load(file)[which]
+  
   out = []
-  for x in match_strings.keys():
-    match = re.search(match_strings[x], x, flags=re.IGNORECASE)
+  for z in match_strings.keys():
+    match = re.search(match_strings[z], x, flags=re.IGNORECASE)
     if bool(match):
-      out.append(x)
+      out.append(z)
   
   out = list(set(out))
   if len(out) == 0:
-    return("unknown or Community Contribution")
+    return(None)
   else:
     out = ", ".join(out)
     return(out)
+
+def guess_project(x):
+  with open('json/match_strings.json', 'r') as file:
+    match_strings = json.load(file)['project']
   
-def process_pubmed_results(results, trans):
-  results['year'] = results['PubDate'].apply(lambda x: x.split()[0])
-  x = ['FirstAuthorSurname', 'Source', 'year', 'PMID']
-  results['name'] = results[x].apply(lambda row: " ".join([row['FirstAuthorSurname'], row['Source'], row['year'], row['PMID']]), axis = 1)
-  results = results.rename(columns = metadata_translation)
+  out = []
+  for project in match_strings.keys():
+    match = re.search(match_strings[project], x, flags=re.IGNORECASE)
+    if bool(match):
+      out.append(project)
   
-  # guess at program label
-  # results['program'] = 
+  out = list(set(out))
+  if len(out) == 0:
+    return(None)
+  else:
+    out = ", ".join(out)
+    return(out)
+
+def guess_pubType(title, journal):
+  x = '|'.join([title, journal])
+  match_strings = {"correction": "Publisher Correction|Author Correction", 
+                   "pre-print": "Biorxiv|Medrxiv"}
+  out = []
+  for pubtype in match_strings:
+    match = re.search(match_strings[pubtype], x, flags=re.IGNORECASE)
+    if bool(match):
+      out.append(pubtype)
   
-  return(results)
-
-
-
-
+  out = list(set(out))
+  if len(out) == 0:
+    return('peer-reviewed')
+  else:
+    out = ", ".join(out)
+    return(out)
 
 
 # END
