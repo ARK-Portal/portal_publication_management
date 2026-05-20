@@ -73,7 +73,7 @@ def get_pubmed_metadata(ids, token, scope):
   results = results[results['authors'].str.contains(test)]
   results = results.reset_index(drop = True)
   
-  #results = process_pubmed_results(results, trans = metadata_translation)
+  results = process_pubmed_results(results, trans = metadata_translation)
   
   return(results)
 

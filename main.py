@@ -28,7 +28,7 @@ def main(scope = None):
     # perform broad query in pubmed for AMP publications
     pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'], token = ncbiapikey)
     # using returned pubmed ids query pubmed for publication metadata
-    results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope)
+    results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope = scope)
     
     results = query_crossref(results)
     results = filter_results(results)
