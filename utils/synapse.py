@@ -15,6 +15,10 @@ from synapseclient.models import query, File, Table
 
 
 def get_all_pubs():
+  '''
+  returns dict of PMID and DOI lists for stuff already tracked in backend 
+  entity view 'All Publications'
+  '''
   syn = synapseclient.login()
   df = query("SELECT id, DOI, PMID from syn64429484")
   
