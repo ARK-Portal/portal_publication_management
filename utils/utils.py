@@ -101,6 +101,8 @@ def finalize_pub_metadata(df):
   df = df.loc[:, keep]
   add = [x for x in list(anno_template.columns) if x not in list(df.columns)]
   
+  df['URL'] = [''.join(['https://doi.org/', x]) for x in df['DOI']]
+  
   return(df)
 
 

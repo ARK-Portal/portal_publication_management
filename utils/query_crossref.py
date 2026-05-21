@@ -13,13 +13,14 @@ import sys
 import requests
 import json
 import pandas as pd
+from utils import *
 
 def query_crossref(doi):
   with open('json/metadata_translation.json', 'r') as file:
     out = json.load(file)['crossref']
 
   for d in doi:
-    print(d)
+    #print(d)
     query = ["https://api.crossref.org/works/doi/", d]
     query = ''.join(query)
     query_response = requests.get(query)
@@ -41,6 +42,7 @@ def query_crossref(doi):
     out['name'] = " ".join([results['author'][0]['family'], journal_dict['journal_short'], "TBD"])
   
   out = pd.DataFrame(out)
+  out['DOI'] = doi
   # add additional columns to fill out annotation template
   out = finalize_pub_metadata(out)
   

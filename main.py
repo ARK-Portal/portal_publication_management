@@ -13,6 +13,7 @@ import pandas as pd
 sys.path.append("utils")
 from utils import *
 from query_pubmed import *
+from query_crossref import *
 from synapse import *
 
 # find new pubs, update pub metadata
@@ -28,12 +29,13 @@ def main(scope = None):
     # perform broad query in pubmed for AMP publications
     pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'], token = ncbiapikey)
     # using returned pubmed ids query pubmed for publication metadata
-    results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope = scope)
+    pm_results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope = scope)
     
-    doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['DOI'])]
+    doi = [x for x in all_ark_pubs["DOI"] if x not in list(pm_results['DOI'])]
     # query CrossRef for pub metadata for pubs not yet in pubmed
-    results = query_crossref(doi)
-    results = filter_results(results)
+    cr_results = query_crossref(doi)
+    
+    results = pd.concat([pm_results, cr_results])
 
 if __name__ == "__main__":
   # calling main function
