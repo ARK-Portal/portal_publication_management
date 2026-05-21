@@ -1,15 +1,7 @@
 {
-  "doi": {
-    "db": "pubmed",
-    "retmax": 1
-  }, 
   "AMP": {
     "db": "pubmed",
     "retmax": 1000, 
-    "term": "Accelerating+Medicines+Partnership+AND+"
-  },
-  "pmid": {
-    "db": "pubmed",
-    "retmax": 1000
+    "term": "Accelerating Medicines Partnership AND "
   }
 }

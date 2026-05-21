@@ -11,34 +11,35 @@ import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
 sys.path.append("utils")
-from utils import *
-from query_pubmed import *
-from query_crossref import *
-from synapse import *
+from utils import get_ncbi_api_key
+from query_pubmed import query_pubmed
+from query_crossref import query_crossref
+from synapse import get_all_pubs
 
 # find new pubs, update pub metadata
 # write to csv for human-in-the-loop review and PR merge
-def main(scope = None):
-  if scope is None:
-    print("please provide a 'scope' for excuting this function")
-  else:
-    ncbiapikey = get_ncbi_api_key()
-    
-    all_ark_pubs = get_all_pubs() # returns dict of PMID and DOI lists for stuff already tracked in backend
-    
-    # perform broad query in pubmed for AMP publications
-    pubmed_ids = query_pubmed_ids(ignore_ids = all_ark_pubs['PMID'], token = ncbiapikey)
-    # using returned pubmed ids query pubmed for publication metadata
-    pm_results = get_pubmed_metadata(pubmed_ids, token = ncbiapikey, scope = scope)
-    
-    doi = [x for x in all_ark_pubs["DOI"] if x not in list(pm_results['DOI'])]
-    # query CrossRef for pub metadata for pubs not yet in pubmed
-    cr_results = query_crossref(doi)
-    
-    results = pd.concat([pm_results, cr_results])
-    
-    fid = "new_publications.csv"
-    pm_results.to_csv(fid, index = False)
+def main():
+  ncbiapikey = get_ncbi_api_key()
+  
+  all_ark_pubs = get_all_pubs() # returns dict of PMID and DOI lists for stuff already tracked in backend
+  
+  # perform broad query in pubmed for AMP publications
+  results = {}
+  results['pubmed'] = query_pubmed(tracked_pubs = all_ark_pubs, token = ncbiapikey)
+  
+  doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['pubmed']['DOI'])]
+  # query CrossRef for pub metadata by doi for pubs not yet in pubmed
+  results['crossref'] = query_crossref(doi)
+  
+  results = pd.concat([results['pubmed'], results['crossref']])
+  
+  new_pubs = results[results['DOI'].isin(doi) == False] # pubs with a DOI that we don't have tracked
+  fid = "new_publications.csv"
+  new_pubs.to_csv(fid, index = False)
+  
+  pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
+  fid = "publication_updates.csv"
+  pub_updates.to_csv(fid, index = False)
 
 if __name__ == "__main__":
   # calling main function

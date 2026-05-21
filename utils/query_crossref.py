@@ -38,7 +38,7 @@ def query_crossref(doi):
     
     authors = process_cr_authors(authors = results['author'])
     out['authors'].append(authors)
-    print(results['author'][0]['family'])
+    #print(results['author'][0]['family'])
     name = " ".join([results['author'][0]['family'], journal_dict['journal_short']])
     out['name'].append(name)
   
