@@ -26,20 +26,28 @@ def main():
   # perform broad query in pubmed for AMP publications
   results = {}
   results['pubmed'] = query_pubmed(tracked_pubs = all_ark_pubs, token = ncbiapikey)
+  print(f"Pubmed query complete! {results['pubmed'].shape[0]} results found.")
   
   doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['pubmed']['DOI'])]
-  # query CrossRef for pub metadata by doi for pubs not yet in pubmed
-  results['crossref'] = query_crossref(doi)
-  
-  results = pd.concat([results['pubmed'], results['crossref']])
+  if len(doi) > 0:
+    # query CrossRef for pub metadata by doi for pubs not yet in pubmed
+    results['crossref'] = query_crossref(doi)
+    print(f"CrossRef query complete! {results['crossref'].shape[0]} results found.")
+    results = pd.concat([results['pubmed'], results['crossref']])
+  else:
+    results = results['pubmed']
   
   new_pubs = results[results['DOI'].isin(doi) == False] # pubs with a DOI that we don't have tracked
-  fid = "new_publications.csv"
-  new_pubs.to_csv(fid, index = False)
+  if new_pubs.shape[0] > 0:
+    print(f"new_pubs.shape[0] new publications found.")
+    fid = "new_publications.csv"
+    new_pubs.to_csv(fid, index = False)
   
   pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
-  fid = "publication_updates.csv"
-  pub_updates.to_csv(fid, index = False)
+  if pub_updates.shape[0] > 0:
+    print(f"pub_updates.shape[0] publications updates.")
+    fid = "publication_updates.csv"
+    pub_updates.to_csv(fid, index = False)
 
 if __name__ == "__main__":
   # calling main function
