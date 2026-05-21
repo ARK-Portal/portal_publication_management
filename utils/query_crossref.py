@@ -13,12 +13,13 @@ import sys
 import requests
 import json
 import pandas as pd
+from datetime import datetime
 from utils import *
 
 def query_crossref(doi):
   with open('json/metadata_translation.json', 'r') as file:
     out = json.load(file)['crossref']
-
+  
   for d in doi:
     #print(d)
     query = ["https://api.crossref.org/works/doi/", d]
@@ -33,16 +34,17 @@ def query_crossref(doi):
     out['journal'].append(journal_dict['journal'])
     out['title'].append(results['title'][0])
     
-    pubDate = [str(x) for x in pubDate]
-    pubDate = '-'.join(pubDate)
-    out['publicationDate'].append(pubDate)
+    out['publicationDate'].append(format_pubDate(pubDate))
     
     authors = process_cr_authors(authors = results['author'])
     out['authors'].append(authors)
-    out['name'] = " ".join([results['author'][0]['family'], journal_dict['journal_short'], "TBD"])
+    print(results['author'][0]['family'])
+    name = " ".join([results['author'][0]['family'], journal_dict['journal_short']])
+    out['name'].append(name)
   
   out = pd.DataFrame(out)
   out['DOI'] = doi
+
   # add additional columns to fill out annotation template
   out = finalize_pub_metadata(out)
   
@@ -74,6 +76,16 @@ def get_journal(results):
   out = {'journal': journal, 'journal_short': journal_short}
   return(out)
 
+def format_pubDate(pubDate):
+    pubDate_str = [str(x) for x in pubDate]
+    pubDate_str = '-'.join(pubDate_str)
+    pubDate_dt = datetime.strptime(pubDate_str, "%Y-%m-%d")
+    short_month = pubDate_dt.strftime("%b")
+    pubDate[1] = short_month
+    pubDate_str = [str(x) for x in pubDate]
+    pubDate_str = ' '.join(pubDate_str)
+    
+    return(pubDate_str)
 
 
 
