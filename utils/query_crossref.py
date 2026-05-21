@@ -41,6 +41,9 @@ def query_crossref(doi):
     out['name'] = " ".join([results['author'][0]['family'], journal_dict['journal_short'], "TBD"])
   
   out = pd.DataFrame(out)
+  # add additional columns to fill out annotation template
+  out = finalize_pub_metadata(out)
+  
   return(out)
 
 def process_cr_authors(authors):

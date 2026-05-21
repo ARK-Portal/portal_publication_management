@@ -85,5 +85,24 @@ def guess_pubType(title, journal):
     out = ", ".join(out)
     return(out)
 
+def finalize_pub_metadata(df):
+  ## guess at program label
+  df['program'] = df['authors'].apply(lambda x:guess_annotation(x, which = "program"))
+  df['project'] = df['title'].apply(lambda x:guess_annotation(x, which = "project"))
+  df['URL'] = [''.join(["https://doi.org/", x]) if re.search('10', x) else None for x in df['DOI']]
+  ## guess at publicationType
+  x = list(map(lambda x, y: '|'.join([x,y]), list(df.title), list(df.journal)))
+  df['publicationType'] = list(map(lambda x, y: guess_pubType(x, y), list(df.title), list(df.journal)))
+  
+  anno_template = get_ark_pub_anno_template()
+  anno_template['authors'] = [None]
+  anno_template['name'] = [None]
+  keep = [x for x in list(df.columns) if x in list(anno_template.columns)]
+  df = df.loc[:, keep]
+  add = [x for x in list(anno_template.columns) if x not in list(df.columns)]
+  
+  return(df)
+
+
 
 # END

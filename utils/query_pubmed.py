@@ -106,25 +106,12 @@ def process_pubmed_results(results, trans):
   results['name'] = results[x].apply(lambda row: " ".join([row['FirstAuthorSurname'], row['Source'], row['year'], row['PMID']]), axis = 1)
   results = results.rename(columns = trans)
   
-  # add additional columns to fill out annotation template
-  ## guess at program label
-  results['program'] = results['authors'].apply(lambda x:guess_annotation(x, which = "program"))
-  results['project'] = results['title'].apply(lambda x:guess_annotation(x, which = "project"))
-  results['URL'] = [''.join(["https://doi.org/", x]) if re.search('10', x) else None for x in results['DOI']]
-  ## guess at publicationType
-  x = list(map(lambda x, y: '|'.join([x,y]), list(results.title), list(results.journal)))
-  results['publicationType'] = list(map(lambda x, y: guess_pubType(x, y), list(results.title), list(results.journal)))
-  
   # modify identifiers for synapse registry match
   results['PMID'] = [''.join(['PMID:', x]) for x in results['PMID']]
   results['PMCID'] = [''.join(['pmc:', x]) for x in results['PMCID']]
   
-  anno_template = get_ark_pub_anno_template()
-  anno_template['authors'] = [None]
-  anno_template['name'] = [None]
-  keep = [x for x in list(results.columns) if x in list(anno_template.columns)]
-  results = results.loc[:, keep]
-  add = [x for x in list(anno_template.columns) if x not in list(results.columns)]
+  # add additional columns to fill out annotation template
+  results = finalize_pub_metadata(results)
   
   return(results)
 
