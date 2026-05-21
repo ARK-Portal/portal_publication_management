@@ -3,12 +3,12 @@
     "db": "pubmed",
     "retmax": 1
   }, 
-  "AMP" {
+  "AMP": {
     "db": "pubmed",
     "retmax": 1000, 
     "term": "Accelerating+Medicines+Partnership+AND+"
   },
-  "pmid" {
+  "pmid": {
     "db": "pubmed",
     "retmax": 1000
   }
