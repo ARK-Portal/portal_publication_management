@@ -36,6 +36,9 @@ def main(scope = None):
     cr_results = query_crossref(doi)
     
     results = pd.concat([pm_results, cr_results])
+    
+    fid = "new_publications.csv"
+    pm_results.to_csv(fid, index = False)
 
 if __name__ == "__main__":
   # calling main function
