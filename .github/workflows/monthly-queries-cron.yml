@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
-      GITHUB_TOKEN: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
       NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+      SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
     
     steps:
       - uses: actions/checkout@v5
