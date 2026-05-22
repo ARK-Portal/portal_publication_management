@@ -69,6 +69,6 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         uses: ad-m/github-push-action@master
         with:
-         github_token: ${{ secrets.GITHUB_TOKEN }}
+         github_token: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
          branch: 'query-results'
          force: true
