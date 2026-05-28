@@ -119,6 +119,10 @@ def harmonize_pub_df(df, add = [None]):
     for n in new:
       df[n] = [None]*df.shape[0]
   
+  # set consistent order of columns of final df
+  order = list(df.columns)
+  order.sort
+  df = df.loc[:,order]
   return(df)
 
 
