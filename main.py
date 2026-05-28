@@ -39,13 +39,13 @@ def main():
   
   new_pubs = results[results['DOI'].isin(doi) == False] # pubs with a DOI that we don't have tracked
   if new_pubs.shape[0] > 0:
-    print(f"new_pubs.shape[0] new publications found.")
+    print(f"{new_pubs.shape[0]} new publications found.")
     fid = "new_publications.csv"
     new_pubs.to_csv(fid, index = False)
   
   pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
   if pub_updates.shape[0] > 0:
-    print(f"pub_updates.shape[0] publications updates.")
+    print(f"{pub_updates.shape[0]} publications updates.")
     
     df = all_ark_pubs['data']
     df = df.loc[:, ['DOI', 'id', 'associatedDataset']]
@@ -60,7 +60,7 @@ def main():
   TBD_pubs = df[df['name'].str.contains("TBD") == True]
   TBD_pubs = harmonize_pub_df(TBD_pubs, add = ['id'])
   if TBD_pubs.shape[0] > 0:
-    print(f"TBD_pubs.shape[0] TBD publications are tracked in backend project already.")
+    print(f"{TBD_pubs.shape[0]} TBD publications are tracked in backend project already.")
     fid = "TBD_publications.csv"
     TBD_pubs.to_csv(fid, index = False)
 
