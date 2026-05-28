@@ -94,8 +94,7 @@ def finalize_pub_metadata(df):
   x = list(map(lambda x, y: '|'.join([x,y]), list(df.title), list(df.journal)))
   df['publicationType'] = list(map(lambda x, y: guess_pubType(x, y), list(df.title), list(df.journal)))
   
-
-  
+  df = harmonize_pub_df(df)
   df['URL'] = [''.join(['https://doi.org/', x]) for x in df['DOI']]
   
   return(df)
@@ -120,9 +119,7 @@ def harmonize_pub_df(df, add = [None]):
       df[n] = [None]*df.shape[0]
   
   # set consistent order of columns of final df
-  order = list(df.columns)
-  order.sort
-  df = df.loc[:,order]
+  df = df.sort_index(axis = 1)
   return(df)
 
 
