@@ -94,17 +94,83 @@ def finalize_pub_metadata(df):
   x = list(map(lambda x, y: '|'.join([x,y]), list(df.title), list(df.journal)))
   df['publicationType'] = list(map(lambda x, y: guess_pubType(x, y), list(df.title), list(df.journal)))
   
-  anno_template = get_ark_pub_anno_template()
-  anno_template['authors'] = [None]
-  anno_template['name'] = [None]
-  keep = [x for x in list(df.columns) if x in list(anno_template.columns)]
-  df = df.loc[:, keep]
-  add = [x for x in list(anno_template.columns) if x not in list(df.columns)]
+
   
   df['URL'] = [''.join(['https://doi.org/', x]) for x in df['DOI']]
   
   return(df)
 
+def harmonize_pub_df(df, add = [None]):
+  anno_template = get_ark_pub_anno_template()
+  add = add + ['authors', 'name', 'associatedDataset', 'has_prePrint', 'has_correction', 'URL']
+  add = list(set(add)) # remove duplicates
+  add = [x for x in add if x is not None]
+  add = [x for x in add if x not in list(anno_template.columns)]
+  for a in add:
+    anno_template[a] = [None]
+  
+  keep = [x for x in list(df.columns) if x in list(anno_template.columns)]
+  keep = [x for x in keep if x is not None]
+  keep.sort
+  df = df.loc[:, keep]
+  new = [x for x in list(anno_template.columns) if x not in list(df.columns)]
+  new = [x for x in new if x is not None]
+  if len(new) > 0:
+    for n in new:
+      df[n] = [None]*df.shape[0]
+  
+  return(df)
+
+
+def file_anno_to_dict(df = None, fid = None, i = None):
+  """Function to convert a csv of annotations into a dictoinary of dictionaries where 
+  each sub-dictionary contains a set of annotation keys with values set as array 
+  that can be looped over to annotate the Synapse identites listed in column 'i'"""
+  
+  # arg testing
+  if i is None:
+    #print("Error: 'i' must be defined where i is the string of the index column name")
+    raise ValueError("'i' must be defined where i is the string of the index column name")
+  
+  if df is None and fid is None:
+    raise ValueError("either 'df' or 'fid' must be defined along with 'i'.")
+    
+  # by allowing the option of specifying a df inplace of a fid
+  # the user can do whatever preprocessing to the df before conversion to dict
+  if df is None:
+    print(f"reading df from {fid}")
+    df = pd.read_csv(fid, dtype = "object")
+  
+  df.fillna('nan', inplace = True)
+  df = df.set_index(i)
+  file_anno = df.to_dict('index')
+  
+  for synID in file_anno:
+    to_del = []
+    for anno in file_anno[synID]:
+      if file_anno[synID][anno] == 'nan':
+        #print(f"{anno} is NaN and will be removed as an annotation")
+        to_del.append(anno)
+      
+      file_anno[synID][anno] = str(file_anno[synID][anno])
+      file_anno[synID][anno] = file_anno[synID][anno].replace(", ", ",")
+      file_anno[synID][anno] = file_anno[synID][anno].replace(" ,", ",")
+      file_anno[synID][anno] = file_anno[synID][anno].split(",")
+      
+      # remove lists that exceed current Synapse Max List Length
+      if len(file_anno[synID][anno]) > 100:
+        to_del.append(anno)
+      
+      # remove annotations that exceed current Synapse character limit
+      if len(''.join(file_anno[synID][anno])) > 500:
+        to_del.append(anno)
+      
+      #print(anno)
+    to_del = list(set(to_del))
+    for key in to_del:
+      del file_anno[synID][key]
+  
+  return file_anno
 
 
 # END
