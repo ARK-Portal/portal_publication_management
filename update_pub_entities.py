@@ -13,7 +13,15 @@ from synapseclient.models import File
 sys.path.append("utils")
 from utils import file_anno_to_dict
 
-df = pd.read_csv("publication_updates.csv")
+# b/c sometimes (tho rarely) the commit change may be to delete a file
+# adding a logical check
+fid = "publication_updates.csv"
+if not os.path.exists("fid"):
+  print(f"{fid} not detected. Exiting...")
+  sys.exit()
+
+# else
+df = pd.read_csv(fid)
 
 pubs_name = df.loc[:, ['name', 'id']]
 pubs_name = pubs_name.set_index('id')
