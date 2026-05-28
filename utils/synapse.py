@@ -20,7 +20,8 @@ def get_all_pubs():
   '''
   syn = synapseclient.login()
   df = query("SELECT * from syn64429484")
-  df['associatedDataset'] = df['associatedDataset'].apply(lambda x: str(x).strip("[]'"))
+  for c in ['associatedDataset', 'has_correction']:
+    df[c] = df[c].apply(lambda x: str(x).strip("[]'"))
   
   out = {'PMID': [], 'DOI': [], 'data': df}
   pmid = df[df.PMID.str.match("^PMID:") == True]
