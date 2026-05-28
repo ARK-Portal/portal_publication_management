@@ -71,7 +71,7 @@ jobs:
           token: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
           commit-message: "${{ github.event.inputs.commit_message || 'commit results of monthly-queries-cron workflow' }}"
           title: "Update ARK Portal Publications"
-          body: "This PR was automatically created by a GitHub Action. Review is required before merging"
+          body: "This PR was automatically created by a GitHub Action. Review is required before merging. Be sure to review TBD_publications.csv to catch existing link entities and prevent creating duplicates"
           delete-branch: false
           branch: "query-results" # The new branch to create
           base: "main" # The branch to merge into
