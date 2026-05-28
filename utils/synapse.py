@@ -11,7 +11,7 @@ import sys
 import synapseclient
 import pandas as pd
 import synapseutils
-from synapseclient.models import query, File, Table
+from synapseclient.models import query, File
 
 def get_all_pubs():
   '''
@@ -20,6 +20,7 @@ def get_all_pubs():
   '''
   syn = synapseclient.login()
   df = query("SELECT * from syn64429484")
+  df['associatedDataset'] = df['associatedDataset'].apply(lambda x: str(x).strip("[]'"))
   
   out = {'PMID': [], 'DOI': [], 'data': df}
   pmid = df[df.PMID.str.match("^PMID:") == True]
