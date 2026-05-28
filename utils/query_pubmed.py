@@ -31,11 +31,12 @@ def perform_scoped_query(token):
   url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"
   
   results = []
+  today = datetime.now()
   for scope in scoped_queries.keys():
     # finish defining query key-value pairs
     term = scoped_queries[scope]['term']
-    #term = "".join([term, str(today.year), '[pdat]'])
-    term = "".join([term, '2025', '[pdat]'])
+    term = "".join([term, str(today.year), '[pdat]'])
+    #term = "".join([term, '2025', '[pdat]'])
     scoped_queries[scope]['term'] = term
     
     scoped_queries[scope]['api_key'] = token
@@ -71,8 +72,9 @@ def query_pubmed(tracked_pubs, token):
     root = ET.fromstring(query_response.content)
     doi2pmid = doi2pmid + get_xmlroot_to_pmid(root)
   
-  more_pub_meta = get_pubmed_metadata(ids = doi2pmid, token = token, scope = None)
-  pub_meta = pd.concat([pub_meta, more_pub_meta])
+  if len(doi2pmid) > 0:
+    more_pub_meta = get_pubmed_metadata(ids = doi2pmid, token = token, scope = None)
+    pub_meta = pd.concat([pub_meta, more_pub_meta])
   
   return(pub_meta)
 
