@@ -163,8 +163,8 @@ def file_anno_to_dict(df = None, fid = None, i = None):
         to_del.append(anno)
       
       # remove annotations that exceed current Synapse character limit
-      if len(''.join(file_anno[synID][anno])) > 500:
-        to_del.append(anno)
+      #if len(''.join(file_anno[synID][anno])) > 500:
+      #  to_del.append(anno)
       
       #print(anno)
     to_del = list(set(to_del))
