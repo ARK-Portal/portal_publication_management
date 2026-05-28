@@ -61,4 +61,9 @@ jobs:
       run: |
         python update_publications.py && 'Publications updated!'
 
+    # update backend Table to surface changes on Portal
+    - name: Update Portal - Publications Table
+      run: |
+        python portal_publications_update.py && 'Portal publications updated!'
+
 # END
