@@ -15,7 +15,7 @@ from utils import file_anno_to_dict
 
 df = pd.read_csv("new_publications.csv")
 n = df.shape[0] + 1
-df['temp'] = [str(x) for x in range(1,4)]
+df['temp'] = [str(x) for x in range(1,n)]
 
 new_pubs_name = df.loc[:, ['name', 'temp']]
 new_pubs_name = new_pubs_name.set_index('temp')
