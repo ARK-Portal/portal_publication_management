@@ -63,11 +63,11 @@ jobs:
       - name: Create new publication link entities
         if: steps.filter.outputs.updates == 'true'
         run: |
-          python update_publications.py && 'Publications updated!'
+          python update_publications.py && echo 'Publications updated!'
 
       # update backend Table to surface changes on Portal
       - name: Update Portal - Publications Table
         run: |
-          python portal_publications_update.py && 'Portal publications updated!'
+          python portal_publications_update.py && echo 'Portal publications updated!'
 
 # END
