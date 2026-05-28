@@ -1,6 +1,6 @@
 #! python
 
-# new_pub_entities.py
+# create_new_pub_entities.py
 
 # import necessary libraries
 import sys
