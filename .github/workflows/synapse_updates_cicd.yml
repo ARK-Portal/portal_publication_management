@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Python Packages
         run: |
-          pip install "synapseclient[pandas]"
+          pip install "synapseclient[pandas]" dotenv
 
       - name: Determine workflow ref
         id: custom_ref_step
