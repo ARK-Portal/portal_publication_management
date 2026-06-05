@@ -15,6 +15,10 @@ on:
         description: 'The commit message to use'
         required: true
         default: 'Manual execution via workflow_dispatch'
+      base:
+        description: 'commit SHA or branch against which to check for changes'
+        required: true
+        default: 'HEAD'
 
 jobs:
   update-synapse:
@@ -47,6 +51,7 @@ jobs:
         uses: dorny/paths-filter@v4
         id: filter
         with:
+          base: ${{ github.event.inputs.base || HEAD }}
           filters: |
             new:
               - 'new_publications.csv'
