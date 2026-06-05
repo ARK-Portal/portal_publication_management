@@ -38,7 +38,7 @@ for x in new_pubs_dict:
   file = File(name = new_pubs_name[x]['name'], parent_id = 'syn64427609', external_url = new_pubs_dict[x]['URL'][0])
   file.synapse_store = False
   file.force_version = False
-  new_pubs_dic[x]['authors'] = ", ".join(new_pubs_dic[x]['authors'])
+  new_pubs_dict[x]['authors'] = ", ".join(new_pubs_dict[x]['authors'])
   file.annotations = new_pubs_dict[x]
   file = file.store()
 
