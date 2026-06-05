@@ -62,8 +62,7 @@ jobs:
         uses: dorny/paths-filter@v4
         id: filter
         with:
-          base: 'main'
-          ref: ${{ env.BASE_REF }}
+          base: ${{ env.BASE_REF }}
           filters: |
             new:
               - 'new_publications.csv'
