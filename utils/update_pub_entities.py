@@ -16,7 +16,7 @@ from utils import file_anno_to_dict
 # b/c sometimes (tho rarely) the commit change may be to delete a file
 # adding a logical check
 fid = "publication_updates.csv"
-if not os.path.exists("fid"):
+if not os.path.exists(fid):
   print(f"{fid} not detected. Exiting...")
   sys.exit()
 
