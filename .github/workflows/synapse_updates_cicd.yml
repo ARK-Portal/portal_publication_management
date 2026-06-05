@@ -47,11 +47,22 @@ jobs:
         run: |
           pip install "synapseclient[pandas]"
 
+      - name: Determine workflow ref
+        id: custom_ref_step
+        run: |
+          # use provided input from workflow dispatch
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "BASE_REF=${{ github.event.inputs.base }}" >> $GITHUB_ENV
+          else
+            echo "BASE_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+          echo $BASE_REF
+
       - name: logical tests for which files have changed
         uses: dorny/paths-filter@v4
         id: filter
         with:
-          base: ${{ github.event.inputs.base || HEAD }}
+          base: ${{ env.VARIABLE_NAME }}
           filters: |
             new:
               - 'new_publications.csv'
