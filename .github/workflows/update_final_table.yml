@@ -1,7 +1,7 @@
 # this workflow is used to executed Synapse activity if new pubs are 
 # identified or if updates are needed
 
-name: synapse_updates_cicd
+name: update_portal-pubs_table
 
 on:
   # only manual execution as an option
