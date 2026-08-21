@@ -41,7 +41,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10.19'
+          python-version: '3.12.14'
 
       - name: Install Python Packages
         run: |
@@ -81,9 +81,14 @@ jobs:
         run: |
           python utils/update_pub_entities.py && echo 'Publications updated!'
 
+      # sleep for two minutes to allow synapse to fulling incorporate changes before running portal_publications_update.py
+      - name: Update Portal - Publications Table
+        run: |
+          sleep 2m
+
       # update backend Table to surface changes on Portal
       - name: Update Portal - Publications Table
         run: |
-          python portal_publications_update.py && echo 'Portal publications updated!'
+          python portal_publications_update.py && echo 'Portal-Publications table updated!'
 
 # END
