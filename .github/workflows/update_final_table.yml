@@ -1,0 +1,47 @@
+# this workflow is used to executed Synapse activity if new pubs are 
+# identified or if updates are needed
+
+name: synapse_updates_cicd
+
+on:
+  # only manual execution as an option
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'The commit message to use'
+        required: true
+        default: 'Manual execution via workflow_dispatch'
+
+jobs:
+  update-synapse:
+    name: Synapse Updates CI/CD
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
+      SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+    
+    steps:
+      - name: Checkout Repositoy
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+          ref: main
+          token: ${{ secrets.ARK_CICD_SERVICE_ACCOUNT }}
+
+      # Set up supported python.
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.14'
+
+      - name: Install Python Packages
+        run: |
+          pip install "synapseclient[pandas]" dotenv
+
+      # update backend Table to surface changes on Portal
+      - name: Update Portal - Publications Table
+        run: |
+          python portal_publications_update.py && echo 'Portal publications updated!'
+
+# END
