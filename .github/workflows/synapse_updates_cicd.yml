@@ -84,7 +84,7 @@ jobs:
       # sleep for two minutes to allow synapse to fulling incorporate changes before running portal_publications_update.py
       - name: Update Portal - Publications Table
         run: |
-          sleep 2m
+          sleep 10m
 
       # update backend Table to surface changes on Portal
       - name: Update Portal - Publications Table
