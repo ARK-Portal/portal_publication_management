@@ -39,6 +39,7 @@ def main():
   
   new_pubs = results[results['DOI'].isin(doi) == False] # pubs with a DOI that we don't have tracked
   if new_pubs.shape[0] > 0:
+    new_pubs.drop_duplicates(inplace=True, ignore_index=True)
     print(f"{new_pubs.shape[0]} new publications found.")
     fid = "new_publications.csv"
     new_pubs.to_csv(fid, index = False)
@@ -52,6 +53,7 @@ def main():
     pub_updates = pub_updates.drop(columns = ['associatedDataset'])
     pub_updates = pd.merge(pub_updates, df, on = 'DOI', how = 'left')
     pub_updates = harmonize_pub_df(pub_updates, add = ['id'])
+    pub_updates.drop_duplicates(inplace=True, ignore_index=True)
     
     fid = "publication_updates.csv"
     pub_updates.to_csv(fid, index = False)
