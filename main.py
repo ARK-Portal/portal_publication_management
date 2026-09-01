@@ -36,15 +36,11 @@ def main():
     results = pd.concat([results['pubmed'], results['crossref']])
   else:
     results = results['pubmed']
+  results.drop_duplicates(inplace=True, ignore_index=True)
   
-  new_pubs = results[results['DOI'].isin(doi) == False] # pubs with a DOI that we don't have tracked
-  if new_pubs.shape[0] > 0:
-    new_pubs.drop_duplicates(inplace=True, ignore_index=True)
-    print(f"{new_pubs.shape[0]} new publications found.")
-    fid = "new_publications.csv"
-    new_pubs.to_csv(fid, index = False)
-  
-  pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
+  # first find pubs to update
+  #pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
+  pub_updates = results[results['DOI'].isin(all_ark_pubs["DOI"]) == True]
   if pub_updates.shape[0] > 0:
     print(f"{pub_updates.shape[0]} publications updates.")
     
@@ -58,8 +54,21 @@ def main():
     fid = "publication_updates.csv"
     pub_updates.to_csv(fid, index = False)
   
+  # then find new pubs
+  new_pubs = results[results['DOI'].isin(all_ark_pubs["DOI"]) == False] # pubs with a DOI that we don't have tracked
+  if new_pubs.shape[0] > 0:
+    new_pubs.drop_duplicates(inplace=True, ignore_index=True)
+    print(f"{new_pubs.shape[0]} new publications found.")
+    fid = "new_publications.csv"
+    new_pubs.to_csv(fid, index = False)
+  
+  # update TBD csv
   df = all_ark_pubs['data']
-  TBD_pubs = df[df['name'].str.contains("TBD") == True]
+  TBD_pubs = df[(df['name'].str.contains("TBD") == True) | (df['PMID'].str.contains("TBD") == True)]
+  
+  if pub_updates.shape[0] > 0:
+    TBD_pubs = TBD_pubs[TBD_pubs['id'].isin(list(pub_updates['id'])) == False]
+  
   TBD_pubs = harmonize_pub_df(TBD_pubs, add = ['id'])
   if TBD_pubs.shape[0] > 0:
     print(f"{TBD_pubs.shape[0]} TBD publications are tracked in backend project already.")
