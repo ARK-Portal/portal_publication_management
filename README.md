@@ -29,7 +29,5 @@ that automates the generation and publication of updated query results.
 
 
 
-
-
-
+[![Architecture diagram of ark-portal/portal_publication_management](https://gitdiagram.com/ark-portal/portal_publication_management/diagram.png)](https://gitdiagram.com/ark-portal/portal_publication_management?utm_source=readme&utm_medium=picture)
 
