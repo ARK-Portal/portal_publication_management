@@ -64,7 +64,7 @@ def query_pubmed(tracked_pubs, token):
   # search pubmed for doi not yet with a pmid in synapse
   # if a pub gets filtered out by scoped filtering it will still be captured if we have the doi tracked
     doi = [d for d in tracked_pubs['DOI'] if d not in pub_meta['DOI']]
-  else: 
+  else:
     doi = tracked_pubs['DOI']
   
   url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"

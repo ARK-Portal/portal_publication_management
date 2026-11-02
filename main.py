@@ -37,15 +37,28 @@ def main():
     # query CrossRef for pub metadata by doi for pubs not yet in pubmed
     results['crossref'] = query_crossref(doi)
     print(f"CrossRef query complete! {results['crossref'].shape[0]} results found.")
-    results = pd.concat([results['pubmed'], results['crossref']])
-  else:
-    results = results['pubmed']
   
+  if results['pubmed'].shape[0] > 0 & results['crossref'].shape[0] > 0:
+    results = pd.concat([results['pubmed'], results['crossref']])
+    results = results.reset_index(drop = True)
+  elif results['pubmed'].shape[0] == 0 & results['crossref'].shape[0] > 0:
+    results = results['crossref']
+  elif results['pubmed'].shape[0] > 0 & results['crossref'].shape[0] == 0:
+    results = results['pubmed']
+  else:
+    print("No publications found this round, nothing to report.")
+    for fid in ["new_publications.csv", "publication_updates.csv"]:
+      if os.path.exists(fid):
+        os.remove(fid)
+    sys.exit(1)
+  
+  # if there are results, do the following
   results.drop_duplicates(inplace=True, ignore_index=True)
   
   # first find pubs to update
   #pub_updates = results[results['DOI'].isin(doi) == True] # pubs with a DOI that we DO have tracked but don't yet have a PMID
   pub_updates = results[results['DOI'].isin(all_ark_pubs["DOI"]) == True]
+  fid = "publication_updates.csv"
   if pub_updates.shape[0] > 0:
     print(f"{pub_updates.shape[0]} publications updates.")
     
@@ -56,8 +69,10 @@ def main():
     pub_updates = harmonize_pub_df(pub_updates, add = ['id'])
     pub_updates.drop_duplicates(inplace=True, ignore_index=True)
     
-    fid = "publication_updates.csv"
     pub_updates.to_csv(fid, index = False)
+  else:
+    if os.path.exists(fid):
+      os.remove(fid)
   
   # then find new pubs
   new_pubs = results[results['DOI'].isin(all_ark_pubs["DOI"]) == False] # pubs with a DOI that we don't have tracked
@@ -68,7 +83,7 @@ def main():
     new_pubs.to_csv(fid, index = False)
   else:
     if os.path.exists(fid):
-      os.remove(file_path)
+      os.remove(fid)
   
   # update TBD csv
   df = all_ark_pubs['data']
