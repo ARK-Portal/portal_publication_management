@@ -56,9 +56,10 @@ def perform_scoped_query(token):
 def query_pubmed(tracked_pubs, token):
   
   pub_meta = perform_scoped_query(token)
-  # remove pubmed ids already cataloged in ARK portal
-  pub_meta = pub_meta[pub_meta['PMID'].isin(tracked_pubs['PMID']) ==False]
-  #pubmed_ids = [x for x in pubmed_ids if x not in tracked_pubs['PMID']]
+  if pub_meta.shape[0] != 0:
+    # remove pubmed ids already cataloged in ARK portal
+    pub_meta = pub_meta[pub_meta['PMID'].isin(tracked_pubs['PMID']) ==False]
+    #pubmed_ids = [x for x in pubmed_ids if x not in tracked_pubs['PMID']]
   
   # search pubmed for doi not yet with a pmid in synapse
   # if a pub gets filtered out by scoped filtering it will still be captured if we have the doi tracked
@@ -114,10 +115,19 @@ def get_pubmed_metadata(ids, token, scope = None):
       program_filter = json.load(file)
     
     test = '|'.join(program_filter[scope])
+    # drop results that don't have any author info
+    results = results.dropna(subset=['authors', 'Title'])
+    results = results.reset_index(drop = True)
+    
     results = results[results['authors'].str.contains(test)]
     results = results.reset_index(drop = True)
-  
-  results = process_pubmed_results(results, trans = metadata_translation)
+    
+    if results.shape[0] == 0:
+      print(f"No publications found matching {scope} scope specifications")
+    else:
+      results = process_pubmed_results(results, trans = metadata_translation)
+  else:
+    results = process_pubmed_results(results, trans = metadata_translation)
   
   return(results)
 
@@ -128,19 +138,24 @@ def get_xml_grandchild(root):
     data[id] = {}
     for gchild in child.iter('Item'):
       name = gchild.get('Name')
-      if name == 'AuthorList':
-        authors = []
-        for ggchild in gchild.iter("Item"):
-          if ggchild.text != '\n\t\t':
-            authors.append(ggchild.text)
-        data[id]['authors'] = ", ".join(authors)
-        # get surname of first author
-        first_auth = authors[0]
-        #first_auth.split()[0]
-        data[id]['FirstAuthorSurname'] = first_auth.split()[0]
-        
-      else:
-        data[id][name] = gchild.text
+      data[id][name] = gchild.text
+    # clean up
+    for x in ['AuthorList', 'Author']:
+      if x in data[id].keys():
+        del data[id][x]
+    
+    # compile author data
+    authors = [author.text for author in child.findall('.//Item[@Name="Author"]')]
+    if len(authors) == 0:
+      authors = [author.text for author in child.findall('.//Item[@Name="LastAuthor"]')]
+    if authors == [None]:
+      data[id]['authors'] = None
+      data[id]['FirstAuthorSurname'] = None
+    else:
+      data[id]['authors'] = ", ".join(authors)
+      # get surname of first author
+      first_auth = authors[0]
+      data[id]['FirstAuthorSurname'] = first_auth.split()[0]
   
   return(data)
 
