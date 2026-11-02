@@ -73,13 +73,13 @@ jobs:
       - name: Create new publication link entities
         if: steps.filter.outputs.new == 'true'
         run: |
-          python utils/create_new_pub_entities.py'
+          python utils/create_new_pub_entities.py
 
       # run only if 'updates' files were changed
       - name: Update publication link entities
         if: steps.filter.outputs.updates == 'true'
         run: |
-          python utils/update_pub_entities.py'
+          python utils/update_pub_entities.py
 
       # sleep for two minutes to allow synapse to fulling incorporate changes before running portal_publications_update.py
       - name: Update Portal - Publications Table
