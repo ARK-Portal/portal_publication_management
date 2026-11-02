@@ -31,6 +31,7 @@ def main():
   if results['pubmed'].shape[0] == 0:
     doi = all_ark_pubs["DOI"]
   else:
+    
     doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['pubmed']['DOI'])]
   
   if len(doi) > 0:
@@ -38,12 +39,12 @@ def main():
     results['crossref'] = query_crossref(doi)
     print(f"CrossRef query complete! {results['crossref'].shape[0]} results found.")
   
-  if results['pubmed'].shape[0] > 0 & results['crossref'].shape[0] > 0:
+  if results['pubmed'].shape[0] > 0 and results['crossref'].shape[0] > 0:
     results = pd.concat([results['pubmed'], results['crossref']])
     results = results.reset_index(drop = True)
-  elif results['pubmed'].shape[0] == 0 & results['crossref'].shape[0] > 0:
+  elif results['pubmed'].shape[0] == 0 and results['crossref'].shape[0] > 0:
     results = results['crossref']
-  elif results['pubmed'].shape[0] > 0 & results['crossref'].shape[0] == 0:
+  elif results['pubmed'].shape[0] > 0 and results['crossref'].shape[0] == 0:
     results = results['pubmed']
   else:
     print("No publications found this round, nothing to report.")
