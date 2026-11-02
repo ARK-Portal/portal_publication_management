@@ -28,7 +28,11 @@ def main():
   results['pubmed'] = query_pubmed(tracked_pubs = all_ark_pubs, token = ncbiapikey)
   print(f"Pubmed query complete! {results['pubmed'].shape[0]} results found.")
   
-  doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['pubmed']['DOI'])]
+  if results['pubmed'].shape[0] == 0:
+    doi = all_ark_pubs["DOI"]
+  else:
+    doi = [x for x in all_ark_pubs["DOI"] if x not in list(results['pubmed']['DOI'])]
+  
   if len(doi) > 0:
     # query CrossRef for pub metadata by doi for pubs not yet in pubmed
     results['crossref'] = query_crossref(doi)
@@ -36,6 +40,7 @@ def main():
     results = pd.concat([results['pubmed'], results['crossref']])
   else:
     results = results['pubmed']
+  
   results.drop_duplicates(inplace=True, ignore_index=True)
   
   # first find pubs to update
@@ -56,11 +61,14 @@ def main():
   
   # then find new pubs
   new_pubs = results[results['DOI'].isin(all_ark_pubs["DOI"]) == False] # pubs with a DOI that we don't have tracked
+  fid = "new_publications.csv"
   if new_pubs.shape[0] > 0:
     new_pubs.drop_duplicates(inplace=True, ignore_index=True)
     print(f"{new_pubs.shape[0]} new publications found.")
-    fid = "new_publications.csv"
     new_pubs.to_csv(fid, index = False)
+  else:
+    if os.path.exists(fid):
+      os.remove(file_path)
   
   # update TBD csv
   df = all_ark_pubs['data']
