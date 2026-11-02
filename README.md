@@ -27,7 +27,9 @@ that automates the generation and publication of updated query results.
 4. Check for changes in repo
 5. If changed detected, push updates to new branch `query-results` and create PR with @jmvera255 tagged for review and approval to merge into main
 
+## Git Diagram
 
+<img src="./gitdiagram.png.png">
 
 [![Architecture diagram of ark-portal/portal_publication_management](https://gitdiagram.com/ark-portal/portal_publication_management/diagram.png)](https://gitdiagram.com/ark-portal/portal_publication_management?utm_source=readme&utm_medium=picture)
 
